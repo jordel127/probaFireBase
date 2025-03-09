@@ -13,4 +13,8 @@ class productoActual : ViewModel() {
     fun setProducte(producte: Producte) {
         _producte.value = producte
     }
+
+    fun clearProducte() {
+        _producte.value = Producte("", "", 0)
+    }
 }

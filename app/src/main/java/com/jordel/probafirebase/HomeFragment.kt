@@ -46,14 +46,22 @@ class HomeFragment : Fragment() {
         cargarDatos()
 
         binding.buttonDelete.setOnClickListener {
-            db.collection("productos").document(vmUser.user).delete()
-                .addOnSuccessListener {
-                    Toast.makeText(requireContext(), "Productos borrados", Toast.LENGTH_SHORT).show()
-                    cargarDatos()
-                }
-                .addOnFailureListener { exception: Exception ->
-                    println("Error borrando el documento: ${exception.message}")
-                }
+            val productoId = vmProducto.producte.value?.id ?: ""
+
+            if (productoId.isNotEmpty()) {
+                db.collection("productos").document(vmUser.user).update("productos.$productoId", FieldValue.delete())
+                    .addOnSuccessListener {
+                        Toast.makeText(requireContext(), "Producto borrado", Toast.LENGTH_SHORT).show()
+                        cargarDatos()
+                        vmProducto.clearProducte()
+                    }
+                    .addOnFailureListener { exception: Exception ->
+                        println("Error borrando el producto: ${exception.message}")
+                        Toast.makeText(requireContext(), "Error al borrar el producto", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                Toast.makeText(requireContext(), "Selecciona un producto para borrar", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.buttonUpdate.setOnClickListener {
@@ -72,6 +80,7 @@ class HomeFragment : Fragment() {
                             .addOnSuccessListener {
                                 Toast.makeText(requireContext(), "Producto actualizado", Toast.LENGTH_SHORT).show()
                                 cargarDatos()
+                                vmProducto.clearProducte()
                             }
                             .addOnFailureListener { exception: Exception ->
                                 println("Error actualizando el documento: ${exception.message}")
@@ -110,6 +119,7 @@ class HomeFragment : Fragment() {
                         }.addOnSuccessListener {
                             Toast.makeText(requireContext(), "Producto guardado", Toast.LENGTH_SHORT).show()
                             cargarDatos()
+                            vmProducto.clearProducte()
                         }.addOnFailureListener {
                             Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show()
                         }
@@ -128,7 +138,7 @@ class HomeFragment : Fragment() {
     private fun cargarDatos() {
         db.collection("productos").document(vmUser.user).get()
             .addOnSuccessListener { document: DocumentSnapshot? ->
-                arrayProductes.clear() // Limpiar la lista antes de cargar nuevos datos
+                arrayProductes.clear()
                 if (document != null && document.exists()) {
                     val datos = document.data
                     if (datos != null && datos.containsKey("productos")) {
@@ -139,8 +149,18 @@ class HomeFragment : Fragment() {
                             arrayProductes.add(Producte(id, nombre, cantidad))
                         }
                     }
+                }else {
+                    val initialData = mapOf("contador" to 0, "productos" to mapOf<String, Map<String, Any>>())
+                    db.collection("productos").document(vmUser.user).set(initialData)
+                        .addOnSuccessListener {
+                            cargarDatos()
+                        }
+                        .addOnFailureListener { exception: Exception ->
+                            println("Error creando el documento: ${exception.message}")
+                        }
+                    return@addOnSuccessListener
                 }
-                adapter.notifyDataSetChanged() // Notificar al adaptador que los datos han cambiado
+                adapter.notifyDataSetChanged()
             }
             .addOnFailureListener { exception: Exception ->
                 println("Error obteniendo el documento: ${exception.message}")
