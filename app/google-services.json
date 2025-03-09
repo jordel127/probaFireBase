@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "652263123734",
+    "project_id": "joelperezprova",
+    "storage_bucket": "joelperezprova.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:652263123734:android:b6f3ca728c285ecf84fe37",
+        "android_client_info": {
+          "package_name": "com.jordel.probafirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbvRcw5_u9Nt7IPjSJ8wM7Wyfmvra_5Qc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
